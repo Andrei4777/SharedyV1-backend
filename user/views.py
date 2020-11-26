@@ -1,21 +1,24 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .serializers import RegistrerSerializer
 from user.models import CustomUser
+from .forms import RegistrationForm
+
+import json
 
 # Create your views here.
 
 
 class CreateUser(APIView):
     def post(self, request, format=None):
-        serializer = RegistrerSerializer(data=request.data)
+        form = RegistrationForm(data=request.data)
 
-        if serializer.is_valid():
+        if form.is_valid():
             CustomUser.objects.create_user(
-                request.data['username'],
-                request.data['email'],
-                request.data['password']
+                username=request.data['username'],
+                email=request.data['email'],
+                password=request.data['password1']
             )
-            return Response("done")
-        return Response("pasz valide")
+            return Response("OK")
+        else:
+            return Response(json.loads(form.errors.as_json()))

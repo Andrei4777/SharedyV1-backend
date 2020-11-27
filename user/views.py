@@ -4,8 +4,6 @@ from rest_framework.response import Response
 from user.models import CustomUser
 from .forms import RegistrationForm
 
-import json
-
 # Create your views here.
 
 
@@ -21,4 +19,4 @@ class CreateUser(APIView):
             )
             return Response("OK")
         else:
-            return Response(json.loads(form.errors.as_json()))
+            return Response(form.errors.as_data())

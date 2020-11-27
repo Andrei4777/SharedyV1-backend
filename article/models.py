@@ -4,7 +4,7 @@ from django.utils import timezone
 from group.models import Group
 from user.models import CustomUser
 from .choices import LikeChoicesArticles
-from shaready.settings import MEDIA_ROOT
+
 # Create your models here.
 
 

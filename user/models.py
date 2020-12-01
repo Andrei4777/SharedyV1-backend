@@ -10,3 +10,8 @@ class CustomUser(AbstractUser):
         max_length=125,
         default="Hello, I am a happy young user who wish to browse the temple of ideas on shaready.fr."
     )
+
+
+class Subscription(models.Model):
+    id_receiving = models.ForeignKey(CustomUser, related_name='user_receiving_follow', on_delete=models.CASCADE)
+    id_giving = models.ForeignKey(CustomUser, related_name='user_giving_follow', on_delete=models.CASCADE)

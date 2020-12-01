@@ -12,3 +12,20 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'username',
             )
+
+
+class MyUserSerializer(serializers.ModelSerializer):
+    infos_user = serializers.SerializerMethodField()
+
+    def get_infos_user(self, obj):
+        return obj.infos_user
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            'image_profile',
+            'description',
+            'id',
+            'username',
+            'infos_user',
+        )

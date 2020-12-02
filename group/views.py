@@ -57,7 +57,7 @@ class GroupsFollow(ListAPIView):
     def get_queryset(self):
         queryset = Group.objects.filter(
             followers__id=self.request.user.id
-        )
+        ).order_by('name')
 
         for i in queryset:
             i.infos_user = {

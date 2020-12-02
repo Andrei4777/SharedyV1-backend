@@ -11,6 +11,7 @@ from .views import (
     Profile,
     SearchUser,
     FollowersUser,
+    EditUser,
 )
 
 from .views import CreateUser
@@ -25,4 +26,5 @@ urlpatterns = [
     path('user/profile/<int:idUser>', Profile.as_view(), name="profile"),
     path('users/search/<str:user>', SearchUser.as_view(), name="search"),
     path('users/followers/<int:idUser>', FollowersUser.as_view(), name="followers"),
+    path('user/edit', EditUser.as_view(), name="edit"),
 ]

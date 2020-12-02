@@ -5,11 +5,15 @@ from rest_framework.generics import ListAPIView
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from django.core.files.base import ContentFile
+
 from article.models import LikeArticle, Article
 from user.models import CustomUser, Subscription
 from .forms import RegistrationForm
 from .serializers import UserSerializer, MyUserSerializer, FollowersSerializer
 from .paginations import UserPagination
+
+import base64
 
 # Create your views here.
 
@@ -138,3 +142,39 @@ class FollowersUser(ListAPIView):
             i.infos_user = serializer.data
 
         return queryset
+
+
+""" views to edit profile """
+
+
+class EditUser(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        serializer = UserSerializer(
+            CustomUser.objects.get(
+                id=request.user.id
+            )
+        )
+
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        request.user.description = request.data['description']
+        request.user.username = request.data['username']
+
+        if "image_profile" in request.data:
+            format, imgstr = request.data['image_profile'].split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr))
+            file_name = str(request.user.id) + "img_profile" + "." + ext
+            if request.user.image_profile != "user-default.svg.png":
+                request.user.image_profile.delete(save=True)
+
+            request.user.image_profile.save(
+                file_name, data, save=True
+            )
+
+        request.user.save()
+        return Response("OK")

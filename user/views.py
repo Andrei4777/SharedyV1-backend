@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from article.models import LikeArticle, Article
 from user.models import CustomUser, Subscription
 from .forms import RegistrationForm
-from .serializers import UserSerializer, MyUserSerializer
+from .serializers import UserSerializer, MyUserSerializer, FollowersSerializer
 from .paginations import UserPagination
 
 # Create your views here.
@@ -78,20 +78,63 @@ class Profile(ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        user = CustomUser.objects.get(
-            id=self.kwargs['idUser']
-        )
-        queryset = CustomUser.objects.filter(id=user.id)
-        articles = Article.objects.filter(creator=user)
+        queryset = CustomUser.objects.filter(id=self.kwargs['idUser'])
+        articles = Article.objects.filter(creator=self.kwargs['idUser'])
 
         for i in queryset:
             i.infos_user = {
                 "nbs_follow": Subscription.objects.filter(
-                    id_receiving=self.request.user.id
+                    id_receiving=self.kwargs['idUser']
                 ).count(),
                 "nbs_goldLike": LikeArticle.objects.filter(
                     article_like__in=articles,
                     choices_like=1
                 ).count()
             }
+        return queryset
+
+
+""" views to get informations searched of user """
+
+
+class SearchUser(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = CustomUser.objects.filter(
+            username__icontains=self.kwargs['user']
+        )[:20]
+
+        return queryset
+
+
+""" views to get all followers of a user """
+
+
+class FollowersUser(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = FollowersSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = UserPagination
+
+    def get_queryset(self):
+        if self.kwargs.get("idUser") == 0:
+            idUser = self.request.user.id
+        else:
+            idUser = self.kwargs.get("idUser")
+
+        queryset = CustomUser.objects.get(
+            id=idUser
+        ).user_receiving_follow.all()
+
+        for i in queryset:
+            serializer = UserSerializer(
+                CustomUser.objects.get(
+                    id=i.id_giving.id
+                )
+            )
+            i.infos_user = serializer.data
+
         return queryset

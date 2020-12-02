@@ -5,7 +5,13 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from .views import RandomUser, MyProfile, Profile
+from .views import (
+    RandomUser,
+    MyProfile,
+    Profile,
+    SearchUser,
+    FollowersUser,
+)
 
 from .views import CreateUser
 
@@ -17,4 +23,6 @@ urlpatterns = [
     path('users/random', RandomUser.as_view(), name="userRandom"),
     path('user/myprofile', MyProfile.as_view(), name="myprofile"),
     path('user/profile/<int:idUser>', Profile.as_view(), name="profile"),
+    path('users/search/<str:user>', SearchUser.as_view(), name="search"),
+    path('users/followers/<int:idUser>', FollowersUser.as_view(), name="followers"),
 ]

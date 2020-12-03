@@ -132,3 +132,52 @@ class SubscriptionArticle(ListAPIView):
         formatDataArticle(queryset, self.request.user)
 
         return queryset
+
+
+class UserArticle(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = ArticlePagination
+
+    def get_queryset(self):
+        if self.kwargs['idUser'] > 0:
+            idUser = self.kwargs['idUser']
+        else:
+            idUser = self.request.user.id
+        queryset = Article.objects.filter(
+            creator__id=idUser
+        ).order_by('-date_article')
+        formatDataArticle(queryset, self.request.user)
+
+        return queryset
+
+
+class GroupArticle(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = ArticlePagination
+
+    def get_queryset(self):
+        queryset = Article.objects.filter(
+            group_article__id=self.kwargs['idArticle']
+        ).order_by('-date_article')
+        formatDataArticle(queryset, self.request.user)
+
+        return queryset
+
+
+class TagArticle(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = ArticlePagination
+
+    def get_queryset(self):
+        queryset = Article.objects.filter(
+            tag_article__id=self.kwargs['idTag']
+        ).order_by('-date_article')
+        formatDataArticle(queryset, self.request.user)
+
+        return queryset

@@ -80,6 +80,7 @@ def formatDataArticle(queryset, user):
                 article_comment=i,
             ).count(),
             "creator": {
+                "id": i.creator.id,
                 "username": i.creator.username,
                 "image_profile": str(i.creator.image_profile),
             },
@@ -181,3 +182,56 @@ class TagArticle(ListAPIView):
         formatDataArticle(queryset, self.request.user)
 
         return queryset
+
+
+class LikesArticle(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        article = Article.objects.get(id=request.data['idArticle'])
+        already_liked = LikeArticle.objects.filter(
+            user_like=request.user,
+            article_like=article
+        )
+        print(article.comment_set.all)
+
+        if already_liked.count() > 0:
+            if int(already_liked[0].choices_like) == int(request.data['like']):
+                already_liked.delete()
+            else:
+                already_liked.update(
+                    choices_like=request.data['like']
+                )
+        else:
+            LikeArticle.objects.create(
+                user_like=request.user,
+                article_like=article,
+                choices_like=request.data['like']
+            )
+
+        dataReturn = {
+            "nbsGoldLike": LikeArticle.objects.filter(
+                article_like=article,
+                choices_like=1,
+            ).count(),
+            "nbsLike": LikeArticle.objects.filter(
+                article_like=article,
+                choices_like=2,
+            ).count(),
+            "nbsDislike": LikeArticle.objects.filter(
+                article_like=article,
+                choices_like=3,
+            ).count(),
+            "nbsComment": article.comment_set.all().count(),
+        }
+
+        liked = LikeArticle.objects.filter(
+            article_like=article,
+            user_like=request.user
+        )
+
+        if liked.count() > 0:
+            dataReturn['liked'] = liked[0].choices_like
+
+        return Response(dataReturn)

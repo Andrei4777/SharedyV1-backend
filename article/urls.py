@@ -6,6 +6,7 @@ from .views import (
     UserArticle,
     GroupArticle,
     TagArticle,
+    LikesArticle,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('articles/user/<int:idUser>', UserArticle.as_view(), name="articleUser"),
     path('articles/group/<int:idArticle>', GroupArticle.as_view(), name="articleGroup"),
     path('articles/tag/<int:idTag>', TagArticle.as_view(), name="articleTag"),
+    path('article/likes', LikesArticle.as_view(), name="articleLike"),
 ]

@@ -33,7 +33,7 @@ def formatComment(queryset):
             "creator": {
                 "image_profile": str(i.user_comment.image_profile.url),
                 "username": i.user_comment.username,
-                'id': i.user_comment.id,
+                "id": i.user_comment.id,
             },
             "like": i.likecomment_set.all().filter(
                 choices_like=1

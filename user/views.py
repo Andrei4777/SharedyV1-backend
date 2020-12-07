@@ -86,6 +86,7 @@ class Profile(ListAPIView):
         articles = Article.objects.filter(creator=self.kwargs['idUser'])
 
         for i in queryset:
+            print(i.user_receiving_follow)
             i.infos_user = {
                 "nbs_follow": Subscription.objects.filter(
                     id_receiving=self.kwargs['idUser']
@@ -93,7 +94,11 @@ class Profile(ListAPIView):
                 "nbs_goldLike": LikeArticle.objects.filter(
                     article_like__in=articles,
                     choices_like=1
-                ).count()
+                ).count(),
+                "followed": Subscription.objects.filter(
+                    id_giving=self.request.user,
+                    id_receiving_id=self.kwargs['idUser'],
+                ).count(),
             }
         return queryset
 
@@ -178,3 +183,27 @@ class EditUser(APIView):
 
         request.user.save()
         return Response("OK")
+
+
+""" views to follow user """
+
+
+class FollowUser(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        followed = 0
+        follow = Subscription.objects.filter(
+            id_receiving=request.data['idUser'],
+            id_giving=request.user,
+        )
+        if follow.count() > 0:
+            follow.delete()
+        else:
+            followed = 1
+            Subscription.objects.create(
+                id_receiving_id=request.data['idUser'],
+                id_giving=request.user,
+            )
+        return Response({"followed": followed})

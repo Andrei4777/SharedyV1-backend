@@ -133,6 +133,37 @@ class GroupOnly(ListAPIView):
         for i in queryset:
             i.infos_user = {
                 "username": i.creator.username,
+                "followed": i.followers.all().filter(
+                    id=self.request.user.id,
+                ).count()
             }
 
         return queryset
+
+
+""" views to post a new follower on group """
+
+
+class GroupFollow(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        follow = 0
+        followedGroup = Group.objects.filter(
+            id=request.data['idGroup']
+        )[0].followers.all().filter(
+            id=request.user.id
+        )
+
+        if followedGroup.count() > 0:
+            Group.objects.filter(
+                id=request.data['idGroup']
+            )[0].followers.remove(request.user)
+        else:
+            Group.objects.filter(
+                id=request.data['idGroup']
+            )[0].followers.add(request.user)
+            follow = 1
+
+        return Response({"followed": follow})

@@ -6,6 +6,7 @@ from .views import (
     GroupTrends,
     MyGroups,
     GroupOnly,
+    GroupFollow,
 )
 
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path('groups/trends', GroupTrends.as_view(), name="groupTrends"),
     path('groups/mygroups', MyGroups.as_view(), name="myGroups"),
     path('group/only/<int:idGroup>', GroupOnly.as_view(), name="onlyGroup"),
+    path('group/follow', GroupFollow.as_view(), name="groupFollow"),
 ]

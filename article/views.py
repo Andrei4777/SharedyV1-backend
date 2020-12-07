@@ -162,8 +162,23 @@ class GroupArticle(ListAPIView):
 
     def get_queryset(self):
         queryset = Article.objects.filter(
-            group_article__id=self.kwargs['idArticle']
+            group_article__id=self.kwargs['idGroup']
         ).order_by('-date_article')
+        formatDataArticle(queryset, self.request.user)
+
+        return queryset
+
+
+class OnlyArticle(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Article.objects.filter(
+            id=self.kwargs['idArticle']
+        ).order_by('-date_article')
+
         formatDataArticle(queryset, self.request.user)
 
         return queryset
@@ -194,7 +209,6 @@ class LikesArticle(APIView):
             user_like=request.user,
             article_like=article
         )
-        print(article.comment_set.all)
 
         if already_liked.count() > 0:
             if int(already_liked[0].choices_like) == int(request.data['like']):

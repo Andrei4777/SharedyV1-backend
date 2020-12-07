@@ -7,6 +7,7 @@ from .views import (
     GroupArticle,
     TagArticle,
     LikesArticle,
+    OnlyArticle,
 )
 
 urlpatterns = [
@@ -14,7 +15,8 @@ urlpatterns = [
     path('articles/trends', TrendsArticle.as_view(), name="trendsArticle"),
     path('articles/subscriptions', SubscriptionArticle.as_view(), name="subscriptionArticle"),
     path('articles/user/<int:idUser>', UserArticle.as_view(), name="articleUser"),
-    path('articles/group/<int:idArticle>', GroupArticle.as_view(), name="articleGroup"),
+    path('articles/group/<int:idGroup>', GroupArticle.as_view(), name="articleGroup"),
     path('articles/tag/<int:idTag>', TagArticle.as_view(), name="articleTag"),
     path('article/likes', LikesArticle.as_view(), name="articleLike"),
+    path('article/<int:idArticle>', OnlyArticle.as_view(), name="onlyArticle"),
 ]

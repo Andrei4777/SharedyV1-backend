@@ -114,3 +114,25 @@ class MyGroups(ListAPIView):
             }
 
         return queryset
+
+
+""" views to get informations to a group """
+
+
+class GroupOnly(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    serializer_class = GroupFollowSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = GroupPagination
+
+    def get_queryset(self):
+        queryset = Group.objects.filter(
+            id=self.kwargs['idGroup']
+        )
+
+        for i in queryset:
+            i.infos_user = {
+                "username": i.creator.username,
+            }
+
+        return queryset
